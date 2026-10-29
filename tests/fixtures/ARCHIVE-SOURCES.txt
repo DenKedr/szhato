@@ -1,0 +1,10 @@
+Archive fixtures (test data only, never executed):
+
+FolderTest.rar, WithComment.rar, HeaderEnc1234.rar:
+https://github.com/YuJianrong/node-unrar.js/tree/master/testFiles
+node-unrar.js project license: MIT; https://github.com/YuJianrong/node-unrar.js/blob/master/LICENSE.md
+
+test_read_format_rar5_compressed.rar, test_read_format_rar5_encrypted.rar,
+test_read_format_rar5_symlink.rar: decoded from their .uu carriers at
+https://github.com/libarchive/libarchive/tree/master/libarchive/test
+libarchive project license: BSD-2-Clause; https://github.com/libarchive/libarchive/blob/master/COPYING

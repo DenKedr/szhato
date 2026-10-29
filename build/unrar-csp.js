@@ -1,0 +1,30 @@
+// CSP compatibility patch for the pinned MIT-licensed node-unrar-js 2.0.2 glue.
+// Only trusted generated naming/ABI wrappers are rewritten as closures. Archive bytes are
+// never transformed into code. Refuse changed upstream bytes instead of silently
+// relaxing CSP or applying an uncertain patch. node_modules stays untouched.
+import {createHash} from 'node:crypto';
+import {createRequire} from 'node:module';
+const require=createRequire(import.meta.url);
+const EXPECTED_SHA256="2f6d35bcf13656600d332dbd009fbcfdafa4a324896dca69252865b35ef36096";
+const ORIGINAL_CREATE_NAMED_FUNCTION="function createNamedFunction(name,body){name=makeLegalFunctionName(name);return new Function(\"body\",\"return function \"+name+\"() {\\n\"+'    \"use strict\";'+\"    return body.apply(this, arguments);\\n\"+\"};\\n\")(body)}";
+export const SAFE_CREATE_NAMED_FUNCTION="function createNamedFunction(name,body){name=makeLegalFunctionName(name);const named=function(...args){return body.apply(this,args)};Object.defineProperty(named,'name',{value:name,configurable:true});return named}";
+const ORIGINAL_CRAFT_INVOKER_FUNCTION="function craftInvokerFunction(humanName,argTypes,classType,cppInvokerFunc,cppTargetFunc){var argCount=argTypes.length;if(argCount<2){throwBindingError(\"argTypes array size mismatch! Must at least get return value and 'this' types!\")}var isClassMethodFunc=argTypes[1]!==null&&classType!==null;var needsDestructorStack=false;for(var i=1;i<argTypes.length;++i){if(argTypes[i]!==null&&argTypes[i].destructorFunction===undefined){needsDestructorStack=true;break}}var returns=argTypes[0].name!==\"void\";var argsList=\"\";var argsListWired=\"\";for(var i=0;i<argCount-2;++i){argsList+=(i!==0?\", \":\"\")+\"arg\"+i;argsListWired+=(i!==0?\", \":\"\")+\"arg\"+i+\"Wired\"}var invokerFnBody=\"return function \"+makeLegalFunctionName(humanName)+\"(\"+argsList+\") {\\n\"+\"if (arguments.length !== \"+(argCount-2)+\") {\\n\"+\"throwBindingError('function \"+humanName+\" called with ' + arguments.length + ' arguments, expected \"+(argCount-2)+\" args!');\\n\"+\"}\\n\";if(needsDestructorStack){invokerFnBody+=\"var destructors = [];\\n\"}var dtorStack=needsDestructorStack?\"destructors\":\"null\";var args1=[\"throwBindingError\",\"invoker\",\"fn\",\"runDestructors\",\"retType\",\"classParam\"];var args2=[throwBindingError,cppInvokerFunc,cppTargetFunc,runDestructors,argTypes[0],argTypes[1]];if(isClassMethodFunc){invokerFnBody+=\"var thisWired = classParam.toWireType(\"+dtorStack+\", this);\\n\"}for(var i=0;i<argCount-2;++i){invokerFnBody+=\"var arg\"+i+\"Wired = argType\"+i+\".toWireType(\"+dtorStack+\", arg\"+i+\"); // \"+argTypes[i+2].name+\"\\n\";args1.push(\"argType\"+i);args2.push(argTypes[i+2])}if(isClassMethodFunc){argsListWired=\"thisWired\"+(argsListWired.length>0?\", \":\"\")+argsListWired}invokerFnBody+=(returns?\"var rv = \":\"\")+\"invoker(fn\"+(argsListWired.length>0?\", \":\"\")+argsListWired+\");\\n\";if(needsDestructorStack){invokerFnBody+=\"runDestructors(destructors);\\n\"}else{for(var i=isClassMethodFunc?1:2;i<argTypes.length;++i){var paramName=i===1?\"thisWired\":\"arg\"+(i-2)+\"Wired\";if(argTypes[i].destructorFunction!==null){invokerFnBody+=paramName+\"_dtor(\"+paramName+\"); // \"+argTypes[i].name+\"\\n\";args1.push(paramName+\"_dtor\");args2.push(argTypes[i].destructorFunction)}}}if(returns){invokerFnBody+=\"var ret = retType.fromWireType(rv);\\n\"+\"return ret;\\n\"}else{}invokerFnBody+=\"}\\n\";args1.push(invokerFnBody);var invokerFunction=new_(Function,args1).apply(null,args2);return invokerFunction}";
+export const SAFE_CRAFT_INVOKER_FUNCTION="function craftInvokerFunction(humanName,argTypes,classType,cppInvokerFunc,cppTargetFunc){\n const argCount=argTypes.length;\n if(argCount<2)throwBindingError(\"argTypes array size mismatch! Must at least get return value and 'this' types!\");\n const isClassMethodFunc=argTypes[1]!==null&&classType!==null;\n const needsDestructorStack=argTypes.slice(1).some(type=>type!==null&&type.destructorFunction===undefined);\n const returns=argTypes[0].name!==\"void\";\n const result=createNamedFunction(humanName,function(...args){\n  if(args.length!==argCount-2)throwBindingError('function '+humanName+' called with '+args.length+' arguments, expected '+(argCount-2)+' args!');\n  const destructors=needsDestructorStack?[]:null;\n  const wired=[],invokeArgs=[cppTargetFunc];\n  if(isClassMethodFunc){wired[1]=argTypes[1].toWireType(destructors,this);invokeArgs.push(wired[1]);}\n  for(let i=2;i<argCount;i++){wired[i]=argTypes[i].toWireType(destructors,args[i-2]);invokeArgs.push(wired[i]);}\n  const rv=cppInvokerFunc.apply(null,invokeArgs);\n  if(needsDestructorStack)runDestructors(destructors);\n  else for(let i=isClassMethodFunc?1:2;i<argCount;i++)if(argTypes[i].destructorFunction!==null)argTypes[i].destructorFunction(wired[i]);\n  return returns?argTypes[0].fromWireType(rv):undefined;\n });\n Object.defineProperty(result,'length',{value:argCount-2,configurable:true});\n return result;\n}";
+export function rewriteUnrarGlue(code){
+ if(createHash('sha256').update(code).digest('hex')!==EXPECTED_SHA256)throw new Error('UnRAR pinned source identity changed; review CSP compatibility patch.');
+ if(code.split(ORIGINAL_CREATE_NAMED_FUNCTION).length!==2)throw new Error('UnRAR pinned wrapper is not unique.');
+ if(code.split(ORIGINAL_CRAFT_INVOKER_FUNCTION).length!==2)throw new Error('UnRAR pinned invoker is not unique.');
+ return code.replace(ORIGINAL_CREATE_NAMED_FUNCTION,SAFE_CREATE_NAMED_FUNCTION).replace(ORIGINAL_CRAFT_INVOKER_FUNCTION,SAFE_CRAFT_INVOKER_FUNCTION);
+}
+export function unrarCspPlugin(){
+ return {
+  name:'szhato-unrar-csp-safe',
+  enforce:'pre',
+  transform(code,id){
+   const file=id.split('?')[0].replaceAll(String.fromCharCode(92),'/');
+   if(!file.endsWith('/node-unrar-js/esm/js/unrar.js'))return null;
+   if(require('node-unrar-js/package.json').version!=='2.0.2')throw new Error('Review UnRAR CSP patch before changing pinned version.');
+   return {code:rewriteUnrarGlue(code),map:null};
+  }
+ };
+}
