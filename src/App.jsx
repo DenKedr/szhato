@@ -24,8 +24,8 @@ function FileArtwork() {
 }
 
 
-export default function App() {
-  const [mode, setMode] = useState(() => new URLSearchParams(window.location.search).get('tool') === 'convert' ? 'convert' : 'compress');
+export default function App({ initialMode } = {}) {
+  const [mode, setMode] = useState(() => initialMode ?? (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('tool') === 'convert' ? 'convert' : 'compress'));
   const [targetFormat, setTargetFormat] = useState('jpeg');
   const [tab, setTab] = useState('all');
   const [rows, setRows] = useState([]);

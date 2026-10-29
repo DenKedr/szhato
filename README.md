@@ -4,6 +4,8 @@
 
 [Открыть Сжато](https://project.it-kedr.ru/compressed) · [Каталог проектов](https://project.it-kedr.ru/) · [GitHub](https://github.com/DenKedr/szhato)
 
+[Техническое SEO и индексирование](docs/seo.md)
+
 ## Возможности
 
 - Конвертер: PDF → JPEG/PNG/WebP, JPG/PNG/WebP → PDF и изображения между собой. [Открыть конвертер](https://project.it-kedr.ru/compressed?tool=convert). [Матрица и ограничения](docs/converter.md).
