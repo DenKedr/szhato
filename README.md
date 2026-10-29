@@ -4,7 +4,7 @@
 
 [Открыть Сжато](https://project.it-kedr.ru/compressed) · [Каталог проектов](https://project.it-kedr.ru/) · [GitHub](https://github.com/DenKedr/szhato)
 
-[Техническое SEO и индексирование](docs/seo.md)
+[Техническое SEO и индексирование](docs/seo.md) · [Метрика на доменах IT Кедр](docs/analytics.md)
 
 ## Возможности
 

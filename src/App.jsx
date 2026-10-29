@@ -151,6 +151,7 @@ export default function App({ initialMode } = {}) {
     const expiresAt = Math.min(...current.map(row => row.expiresAt));
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
+    anchor.className = 'ym-hide-content ym-disable-tracklink';
     anchor.href = url;
     anchor.download = filename;
     document.body.appendChild(anchor);
@@ -305,8 +306,8 @@ export default function App({ initialMode } = {}) {
       <section className={`compressor ${converting ? 'converter-mode' : ''}`} aria-label={converting ? 'Конвертация файлов' : 'Сжатие файлов'}>
         <div className="workspace-top"><div className="tabs" role="tablist" aria-label="Тип файлов">{visibleTabs.map(({ id, name, icon: Icon }) => <button key={id} type="button" role="tab" id={`tab-${id}`} aria-selected={tab === id} aria-controls="file-workspace" className={tab === id ? 'tab active' : 'tab'} onClick={() => setTab(id)} disabled={busy || zipping || (converting && targetFormat === 'pdf' && id === 'pdf')}><Icon size={17} />{name}</button>)}</div><span className="workspace-limit">До {formatBytes(MAX_FILE_BYTES)} на файл</span></div>
         <div className="workspace-grid">
-          <div className="file-workspace" id="file-workspace" role="tabpanel" aria-labelledby={`tab-${tab}`}>
-            <input ref={input} className="visually-hidden" type="file" multiple accept={pickerAccept} aria-label={converting ? 'Выбрать файлы для конвертации' : 'Выбрать файлы для сжатия'} onChange={event => addFiles(event.target.files)} disabled={busy || zipping} tabIndex={-1} />
+          <div className="file-workspace ym-hide-content" id="file-workspace" role="tabpanel" aria-labelledby={`tab-${tab}`}>
+            <input ref={input} className="visually-hidden ym-disable-keys ym-hide-content" type="file" multiple accept={pickerAccept} aria-label={converting ? 'Выбрать файлы для конвертации' : 'Выбрать файлы для сжатия'} onChange={event => addFiles(event.target.files)} disabled={busy || zipping} tabIndex={-1} />
             <div className={`dropzone ${dragging ? 'dragging' : ''} ${rows.length ? 'dropzone-compact' : ''}`} onDragEnter={event => { event.preventDefault(); dragDepth.current++; setDragging(true); }} onDragOver={event => event.preventDefault()} onDragLeave={event => { event.preventDefault(); if (--dragDepth.current <= 0) { dragDepth.current = 0; setDragging(false); } }} onDrop={handleDrop}>
               {!rows.length && <FileArtwork />}
               <h2>{dragging ? 'Отпустите файлы здесь' : rows.length ? 'Есть ещё файлы?' : 'Перетащите файлы сюда'}</h2>
