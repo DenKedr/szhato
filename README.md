@@ -1,14 +1,14 @@
-# Сжато
+# Сжато и Конвертер
 
-Бесплатный Open Source сайт для сжатия и конвертации PDF и изображений, а также перепаковки ZIP/RAR в ZIP. Автор — Денис Шарапов. Оригинальный код — MIT; лицензии зависимостей в THIRD_PARTY_NOTICES.txt и public/licenses/.
+Два бесплатных Open Source проекта: «Сжато» уменьшает PDF, фотографии и архивы; «Конвертер» меняет форматы PDF и изображений. У них отдельные страницы, названия и настройки. В репозитории используется общий движок обработки файлов. Автор — Денис Шарапов. Оригинальный код — MIT; лицензии зависимостей в THIRD_PARTY_NOTICES.txt и public/licenses/.
 
-[Открыть Сжато](https://project.it-kedr.ru/compressed) · [Каталог проектов](https://project.it-kedr.ru/) · [GitHub](https://github.com/DenKedr/szhato)
+[Открыть Сжато](https://project.it-kedr.ru/compressed) · [Открыть Конвертер](https://project.it-kedr.ru/converter) · [Каталог проектов](https://project.it-kedr.ru/) · [GitHub](https://github.com/DenKedr/szhato)
 
 [Техническое SEO и индексирование](docs/seo.md) · [Метрика на доменах IT Кедр](docs/analytics.md)
 
 ## Возможности
 
-- Конвертер: PDF → JPEG/PNG/WebP, JPG/PNG/WebP → PDF и изображения между собой. [Открыть конвертер](https://project.it-kedr.ru/compressed?tool=convert). [Матрица и ограничения](docs/converter.md).
+- Конвертер: PDF → JPEG/PNG/WebP, JPG/PNG/WebP → PDF и изображения между собой. [Открыть конвертер](https://project.it-kedr.ru/converter). [Матрица и ограничения](docs/converter.md).
 
 - Тёмный интерфейс в стиле iOS, компьютер и мобильный экран.
 - PDF: минимальный размер по умолчанию на любом уровне (страницы становятся изображениями, теряются выделение/поиск текста, ссылки и формы). Можно вручную выбрать сохранение текста и JPEG-оптимизацию.
@@ -24,7 +24,7 @@
 
 Лимиты распаковки одного архива:10000записей,512МиБ суммарно,256МиБ на запись, коэффициент до200; preflight и контроль фактических байтов. Опасные пути, ссылки, специальные типы, шифрование, многотомность и самораспаковывающиеся EXE отклоняются. Worker завершается при отмене, истечении TTL и после120сек. Подробнее: [docs/archives.md](docs/archives.md).
 
-500МиБ/2ГиБ — пределы входной очереди, а не гарантия достаточной памяти любого устройства. Изображения ограничены32Мп, PDF-растеризация150страницами. Подписанные, защищённые PDF и анимированные PNG/WebP отклоняются. HEIC/GIF/видео не поддерживаются.
+500МиБ/2ГиБ — пределы входной очереди, а не гарантия достаточной памяти любого устройства. Изображения ограничены32Мп, PDF-растеризация150страницами. При сжатии подписанные и защищённые PDF отклоняются. Конвертер может отрисовать подписанный PDF, но подпись не переносится. Анимированные PNG/WebP и PDF с паролем не поддерживаются. HEIC/GIF/видео не поддерживаются.
 
 ## Разработка
 
@@ -35,7 +35,7 @@ npm ci
 npm run dev -- --port 5173
 ```
 
-Dev: http://127.0.0.1:5173 .
+Dev: http://127.0.0.1:5173/ — Сжато; http://127.0.0.1:5173/converter/ — Конвертер.
 
 ```sh
 npm test
@@ -43,7 +43,7 @@ npm run build
 npm run preview -- --port 4173
 ```
 
-Production preview: http://127.0.0.1:4173/compressed/ . Содержимое dist размещается в /compressed/; каталог из catalog/ — в корне домена. Не запускайте index.html через file://. На nginx .mjs должен иметь Content-Type application/javascript, .wasm — application/wasm. Строгий CSP допускает WebAssembly, но не требует unsafe-eval для JS.
+Production preview: http://127.0.0.1:4173/compressed/ и http://127.0.0.1:4173/compressed/converter/ . Для выкладки dist/converter переносится в корень /converter; остальные файлы dist размещаются в /compressed/. Общие ресурсы обоих проектов находятся в /compressed/. Каталог из catalog/ — в корне домена. Старая ссылка /compressed?tool=convert перенаправляется301 на /converter. Не запускайте index.html через file://. На nginx .mjs должен иметь Content-Type application/javascript, .wasm — application/wasm. Строгий CSP допускает WebAssembly, но не требует unsafe-eval для JS.
 
 ## Проверка
 

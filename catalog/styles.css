@@ -82,3 +82,7 @@ h1{max-width:960px;font-size:clamp(36px,4.9vw,60px);font-weight:680;letter-spaci
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important;animation:none!important}}
 
 @media(max-width:650px){.site-brand{min-width:0;white-space:normal}.site-brand>span:last-child{line-height:1.2}.catalog-mark,nav{flex-shrink:0}}
+
+.project-card+.project-card{margin-top:28px}.converter-project .project-art{background:radial-gradient(ellipse at 45% 35%,rgba(30,194,166,.12),transparent 68%),#0c1819}.converter-project .document-front{background:linear-gradient(145deg,#16a38f,#0d806e)}.converter-project .compress-symbol{color:#b8f3df;border-color:#3b6865}.converter-project .art-dot{background:#56d6b1;box-shadow:0 0 12px rgba(86,214,177,.3)}
+
+.art-brand img{width:32px;height:32px;border-radius:9px;flex-shrink:0}

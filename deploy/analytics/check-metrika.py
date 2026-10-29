@@ -11,7 +11,7 @@ for line in nginx.splitlines():
 assert 'it-kedr.ru' in hosts,'Main public virtual host missing'
 urls={'https://'+host+'/' for host in hosts}
 urls.update(sys.argv[1:])
-urls.update(['https://it-kedr.ru/soft/','https://it-kedr.ru/forum/','https://project.it-kedr.ru/compressed','https://project.it-kedr.ru/compressed?tool=convert'])
+urls.update(['https://it-kedr.ru/soft/','https://it-kedr.ru/forum/','https://project.it-kedr.ru/compressed','https://project.it-kedr.ru/compressed?tool=convert','https://project.it-kedr.ru/converter'])
 checked=[]
 for url in sorted(urls):
  with urllib.request.urlopen(url,timeout=20) as response:

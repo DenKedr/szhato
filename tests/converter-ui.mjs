@@ -24,8 +24,8 @@ async function newPage({convert=true,clock=false}={}){
     URL.createObjectURL=blob=>{const url=original(blob);window.__qaBlobMetadata.push({url,type:blob.type,size:blob.size});return url;};
   });
   if(clock)await page.clock.install({time:BASE});
-  const url=new URL(base);if(convert)url.searchParams.set('tool','convert');
-  await page.goto(url.href);await page.getByRole('button',{name:'Конвертер',exact:true}).waitFor();
+  const url=new URL(convert?'/converter':'/compressed',base);
+  await page.goto(url.href);await page.getByRole('heading',{level:1,name:convert?/Нужный формат/:/Меньше размер/}).waitFor();
   if(clock)await page.clock.pauseAt(BASE+10000);
   if(!png){
     const fixture=await page.evaluate(async()=>{
@@ -79,11 +79,12 @@ function assertMagic(bytes,format){
 }
 
 try{
-  // Deep-link/reload, drag-and-drop and explicit incompatibility without losing the queue.
+  // Separate converter entry/reload, drag-and-drop and incompatibility without losing the queue.
   {
-    const page=await newPage();assert.equal(await page.getByRole('button',{name:'Конвертер',exact:true}).getAttribute('aria-pressed'),'true');
+    const page=await newPage();assert.equal(new URL(page.url()).pathname.replace(/\/$/,''),'/converter');
     await page.reload();await page.getByLabel('Конвертировать в',{exact:true}).waitFor();
-    assert.equal(await page.getByRole('button',{name:'Конвертер',exact:true}).getAttribute('aria-pressed'),'true');
+    assert.equal(await page.locator('.tool-switch').count(),0);
+    assert.equal(await page.locator('.sibling-project').getAttribute('href'),'/compressed');
     await drop(page,[pdfFile(),pngFile(),zipFile()]);assert.equal(await page.locator('.file-row').count(),2);
     assert.match(await page.getByRole('alert').innerText(),/ZIP|RAR|архив/i);
     const names=await page.locator('.file-name').allTextContents();
@@ -93,12 +94,7 @@ try{
     assert.match(await page.locator('.conversion-notice').innerText(),/Очередь сохранена/);
     await page.getByLabel('Конвертировать в',{exact:true}).selectOption('jpeg');
     assert.equal(await page.getByRole('button',{name:'Конвертировать файлы',exact:true}).isEnabled(),true);
-    await page.getByRole('button',{name:'Сжатие',exact:true}).click();assert.equal(new URL(page.url()).searchParams.has('tool'),false);
-    await choose(page,[zipFile()]);assert.equal(await page.locator('.file-row').count(),3);
-    await page.getByRole('button',{name:'Конвертер',exact:true}).click();assert.equal(new URL(page.url()).searchParams.get('tool'),'convert');
-    assert.equal(await page.locator('.file-row').count(),3);assert.match(await page.locator('.conversion-notice').innerText(),/documents.zip/);
-    assert.equal(await page.getByRole('button',{name:'Конвертировать файлы',exact:true}).isDisabled(),true);
-    report.navigationAndValidation={deepLinkAndReload:true,mixedDropRetainsCompatibleFiles:true,rejectedArchive:true,pdfTargetDoesNotRemoveQueuedPdf:true,modeSwitchRetainsArchiveWithWarning:true};
+    report.navigationAndValidation={separateEntryAndReload:true,noModeSwitch:true,siblingProjectLink:true,mixedDropRetainsCompatibleFiles:true,rejectedArchive:true,pdfTargetDoesNotRemoveQueuedPdf:true};
     await page.close();
   }
   // New formats must be returned even if larger, with matching extension, MIME and file bytes.
@@ -139,15 +135,16 @@ try{
   {
     const page=await newPage({clock:true});await choose(page,[imageFile()]);const expiry=Number(await page.locator('.file-row').getAttribute('data-expires-at'));
     await page.getByRole('button',{name:'Конвертировать файлы',exact:true}).dispatchEvent('click');
-    assert.equal(await page.getByRole('button',{name:'Конвертер',exact:true}).isDisabled(),true);assert.equal(await page.getByRole('button',{name:'Сжатие',exact:true}).isDisabled(),true);
+    assert.equal(await page.locator('.tool-switch').count(),0);
+    assert.equal(await page.locator('input[name="compression-level"]').first().isDisabled(),true);
     assert.equal(await page.getByLabel('Конвертировать в',{exact:true}).isDisabled(),true);
     for(let i=0;i<150&&!await page.locator('.results').count();i++){await page.clock.runFor(50);await new Promise(resolve=>setTimeout(resolve,10));}
     await page.locator('.results').waitFor();assert.equal(Number(await page.locator('.file-row').getAttribute('data-expires-at')),expiry);
-    await page.getByRole('button',{name:'Сжатие',exact:true}).dispatchEvent('click');await page.getByRole('button',{name:'Конвертер',exact:true}).dispatchEvent('click');
+    await page.getByLabel('Конвертировать в',{exact:true}).selectOption('png');await page.getByLabel('Конвертировать в',{exact:true}).selectOption('jpeg');
     assert.equal(Number(await page.locator('.file-row').getAttribute('data-expires-at')),expiry);
     await page.clock.setSystemTime(expiry-1000);await page.evaluate(()=>window.dispatchEvent(new Event('focus')));assert.equal(await page.locator('.file-row').count(),1);
     await page.clock.setSystemTime(expiry);await page.evaluate(()=>window.dispatchEvent(new Event('focus')));assert.equal(await page.locator('.file-row').count(),0);assert.equal(await page.locator('.results').count(),0);
-    report.ttlAndBusy={modeAndTargetDisabledWhileBusy:true,conversionDoesNotExtendTtl:true,modeSwitchDoesNotExtendTtl:true,removedAtFifteenMinutes:true};await page.close();
+    report.ttlAndBusy={qualityAndTargetDisabledWhileBusy:true,noModeSwitch:true,conversionDoesNotExtendTtl:true,targetChangeDoesNotExtendTtl:true,removedAtFifteenMinutes:true};await page.close();
   }
   // Compression and ZIP remain reachable; GitHub link and former count-cap removal remain intact.
   {
