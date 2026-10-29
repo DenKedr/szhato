@@ -1,10 +1,12 @@
 # Сжато
 
-Бесплатный Open Source сайт для сжатия PDF, JPG, PNG, WebP и перепаковки ZIP/RAR в ZIP. Автор — Денис Шарапов. Оригинальный код — MIT; лицензии зависимостей в THIRD_PARTY_NOTICES.txt и public/licenses/.
+Бесплатный Open Source сайт для сжатия и конвертации PDF и изображений, а также перепаковки ZIP/RAR в ZIP. Автор — Денис Шарапов. Оригинальный код — MIT; лицензии зависимостей в THIRD_PARTY_NOTICES.txt и public/licenses/.
 
 [Открыть Сжато](https://project.it-kedr.ru/compressed) · [Каталог проектов](https://project.it-kedr.ru/) · [GitHub](https://github.com/DenKedr/szhato)
 
 ## Возможности
+
+- Конвертер: PDF → JPEG/PNG/WebP, JPG/PNG/WebP → PDF и изображения между собой. [Открыть конвертер](https://project.it-kedr.ru/compressed?tool=convert). [Матрица и ограничения](docs/converter.md).
 
 - Тёмный интерфейс в стиле iOS, компьютер и мобильный экран.
 - PDF: минимальный размер по умолчанию на любом уровне (страницы становятся изображениями, теряются выделение/поиск текста, ссылки и формы). Можно вручную выбрать сохранение текста и JPEG-оптимизацию.

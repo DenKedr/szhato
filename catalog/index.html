@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#08090d">
-  <meta name="description" content="Бесплатные проекты с открытым исходным кодом от Дениса Шарапова. Сжато — сжатие PDF, фотографий и перепаковка ZIP/RAR прямо в браузере. Пользуйтесь, изучайте и улучшайте код.">
+  <meta name="description" content="Бесплатные проекты с открытым исходным кодом от Дениса Шарапова. Сжато — сжатие и конвертация PDF и фотографий, перепаковка ZIP/RAR прямо в браузере. Пользуйтесь, изучайте и улучшайте код.">
   <meta name="author" content="Денис Шарапов">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ru_RU">
   <meta property="og:title" content="Проекты Дениса — бесплатно и с открытым кодом">
-  <meta property="og:description" content="Полезные Open Source проекты. Сжимайте PDF, фотографии и архивы ZIP/RAR в Сжато. Код на GitHub, исходники ZIP и бесплатный запуск.">
-  <meta property="og:url" content="https://project.it-kerr.ru/">
-  <link rel="canonical" href="https://project.it-kerr.ru/">
+  <meta property="og:description" content="Полезные Open Source проекты. Сжатие и конвертация PDF, JPG, PNG и WebP. Перепаковка ZIP/RAR. Код на GitHub и бесплатный запуск.">
+  <meta property="og:url" content="https://project.it-kedr.ru/">
+  <link rel="canonical" href="https://project.it-kedr.ru/">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%230a84ff'/%3E%3Cpath d='M24 20 12 32l12 12m16-24 12 12-12 12' fill='none' stroke='white' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="/styles.css">
   <title>Проекты Дениса — бесплатно и с открытым кодом</title>
@@ -54,8 +54,8 @@
         </div>
         <div class="project-content">
           <div class="project-title-row"><h3 id="szhato-title">Сжато</h3><span class="license-tag">MIT</span></div>
-          <p class="project-subtitle">PDF, фотографии и архивы — в одном инструменте</p>
-          <p class="project-description">Сжимайте PDF и фотографии, перепаковывайте ZIP и RAR в ZIP без изменения содержимого. Выбирайте уровень сжатия, сравнивайте фактический размер и скачивайте результат. Размер архива может не уменьшиться.</p>
+          <p class="project-subtitle">Сжатие и конвертация — прямо в браузере</p>
+          <p class="project-description">Сжимайте PDF и фотографии, конвертируйте JPG, PNG, WebP и PDF, перепаковывайте ZIP и RAR в ZIP без изменения содержимого. Каждое фото — отдельный PDF, многостраничный PDF — ZIP с изображениями. Сравнивайте фактический размер результата: новый формат или архив может оказаться больше исходника.</p>
           <ul class="format-list" aria-label="Поддерживаемые форматы"><li>PDF</li><li>JPG</li><li>PNG</li><li>WebP</li><li>ZIP</li><li>RAR</li></ul>
           <ul class="project-features">
             <li><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="4" y="8" width="12" height="9" rx="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M6.5 8V6a3.5 3.5 0 0 1 7 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span>Обработка на вашем устройстве. Файлы не отправляются на сервер.</span></li>
@@ -63,10 +63,11 @@
           </ul>
           <div class="project-actions">
             <a class="button button-primary" href="/compressed">Открыть Сжато<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M6 14 14 6m-8 0h8v8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+            <a class="button button-secondary" href="/compressed?tool=convert">Открыть конвертер<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 6h12m-3-3 3 3-3 3M16 14H4m3-3-3 3 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
             <a class="button button-secondary" href="/source/szhato-source.zip" download><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 3v9m-3-3 3 3 3-3M4 13v3h12v-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Исходники ZIP</a>
             <a class="button button-secondary" href="https://github.com/DenKedr/szhato" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m7 5-5 5 5 5m6-10 5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>GitHub</a>
           </div>
-          <p class="project-description">Для архивов: до 10 000 записей, 512 МиБ распакованного содержимого и 256 МиБ на запись. Вложенные архивы не распаковываются повторно.</p>
+          <p class="project-description">Конвертер: до 32 Мп на изображение, 150 страниц PDF и 512 МиБ изображений в ZIP результата. Для архивов: до 10 000 записей, 512 МиБ распакованного содержимого и 256 МиБ на запись. Вложенные архивы не распаковываются повторно.</p>
           <p class="project-credit">Бесплатно. Без регистрации. Автор — Денис Шарапов.</p>
         </div>
       </article>

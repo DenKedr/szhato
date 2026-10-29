@@ -27,7 +27,7 @@ function makeResult(file,blob,filename,note,kind) {
   return {blob,filename:uniqueFilename(filename),originalSize:file.size,outputSize:blob.size,savedPercent:Math.max(0,Math.round((1-blob.size/file.size)*100)),changed,note,kind};
 }
 // Inspect dimensions before image decoding to bound canvas and bitmap allocation.
-function inspectImage(bytes) {
+export function inspectImage(bytes) {
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   const ascii = (a,b)=>String.fromCharCode(...bytes.subarray(a,b));
   if (bytes.length>=24 && bytes[0]===137 && ascii(1,4)==='PNG') {
@@ -127,7 +127,7 @@ async function optimizePdfImages(doc,options,onProgress,signal) {
   return changed;
 }
 let pdfjsPromise;
-async function getPdfJs() {
+export async function getPdfJs() {
   pdfjsPromise??=Promise.all([import('pdfjs-dist'),import('pdfjs-dist/build/pdf.worker.min.mjs?url')]).then(([pdfjs,worker])=>{pdfjs.GlobalWorkerOptions.workerSrc=worker.default;return pdfjs;}).catch(error=>{pdfjsPromise=undefined;throw error;});
   return pdfjsPromise;
 }
