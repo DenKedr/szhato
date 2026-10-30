@@ -50,10 +50,15 @@ function verifySeparateUi(html, project) {
     assert.doesNotMatch(html, /id="conversion-format"/);
     assert.doesNotMatch(html, /Конвертировать файлы/);
     assert.match(html, /<option value="raster" selected="">/);
+    assert.match(html, /<select id="archive-mode"/);
+    assert.match(html, /<option value="optimize" selected="">Сжать PDF и фотографии внутри<\/option>/);
+    assert.match(html, /Только перепаковать без изменения файлов/);
+    assert.match(html, /Поиск, выделение текста, ссылки, формы и подписи не сохранятся/);
   } else {
     assert.match(html, /Конвертировать файлы/);
     assert.match(html, /id="conversion-format"/);
     assert.doesNotMatch(html, />Сжать файлы</);
+    assert.doesNotMatch(html, /id="archive-mode"/);
   }
 }
 

@@ -68,6 +68,10 @@ export function inspectImage(bytes) {
 }
 async function compressImage(file,bytes,options,onProgress,signal) {
   const meta=inspectImage(bytes);
+  if(options.preserveImageFormat){
+    const expected=/\.jpe?g$/i.test(file.name)?'image/jpeg':/\.png$/i.test(file.name)?'image/png':'image/webp';
+    if(meta.type!==expected)throw new Error('Расширение фотографии не соответствует её формату.');
+  }
   if(!meta.width||!meta.height||meta.width*meta.height>32_000_000) throw new Error('Фотография слишком большая: допустимо до 32 мегапикселей.');
   checkAbort(signal);
   const bitmap=await createImageBitmap(new Blob([bytes],{type:meta.type}),{imageOrientation:'from-image'});
@@ -78,7 +82,8 @@ async function compressImage(file,bytes,options,onProgress,signal) {
     const scale=Math.min(1,preset.edge/Math.max(bitmap.width,bitmap.height));
     canvas=document.createElement('canvas');
     canvas.width=Math.max(1,Math.round(bitmap.width*scale));canvas.height=Math.max(1,Math.round(bitmap.height*scale));
-    const type=options.imageFormat==='jpeg'?'image/jpeg':options.imageFormat==='webp'?'image/webp':meta.type==='image/jpeg'?'image/jpeg':'image/webp';
+    // Archive members keep their paths and extensions, including PNG/JPEG.
+    const type=options.preserveImageFormat?meta.type:options.imageFormat==='jpeg'?'image/jpeg':options.imageFormat==='webp'?'image/webp':meta.type==='image/jpeg'?'image/jpeg':'image/webp';
     const ctx=canvas.getContext('2d');
     if(!ctx) throw new Error('Браузер не поддерживает обработку изображений.');
     if(type==='image/jpeg') {ctx.fillStyle='#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);}
@@ -86,7 +91,7 @@ async function compressImage(file,bytes,options,onProgress,signal) {
     onProgress(60,'Сжимаем фотографию');await yieldFrame();checkAbort(signal);
     const blob=await toBlob(canvas,type,preset.quality);checkAbort(signal);
     if(blob.type!==type) throw new Error('Этот браузер не умеет сохранять выбранный формат. Попробуйте JPG.');
-    const filename=file.name.replace(/\.[^.]+$/,'')+'-сжато.'+(type==='image/jpeg'?'jpg':'webp');
+    const filename=file.name.replace(/\.[^.]+$/,'')+'-сжато.'+(type==='image/jpeg'?'jpg':type==='image/png'?'png':'webp');
     const note=`${canvas.width} × ${canvas.height} пикс. Метаданные EXIF удалены.${type==='image/jpeg'&&meta.type!=='image/jpeg'?' Прозрачность заменена белым фоном.':''}`;
     return makeResult(file,blob,filename,note,'image');
   } finally {bitmap.close();if(canvas)canvas.width=canvas.height=0;}
@@ -132,11 +137,11 @@ export async function getPdfJs() {
   return pdfjsPromise;
 }
 async function rasterPdf(file,bytes,options,onProgress,signal) {
-  const original=await loadPdf(bytes); // validate signatures and encryption before rendering
+  const original=await loadPdf(bytes,{raster:true}); // validate signatures, encryption and embedded image budgets before rendering
   if(original.getPageCount()>150) throw new Error('Для сжатия страниц в изображения допустимо до 150 страниц. Выберите режим сохранения текста.');
   const pdfjs=await getPdfJs();checkAbort(signal);
   const base=import.meta.env.BASE_URL;
-  const loading=pdfjs.getDocument({data:bytes.slice(),isEvalSupported:false,useSystemFonts:true,cMapUrl:base+'pdf-cmaps/',cMapPacked:true,standardFontDataUrl:base+'pdf-fonts/',wasmUrl:base+'pdf-wasm/'});
+  const loading=pdfjs.getDocument({data:bytes.slice(),isEvalSupported:false,maxImageSize:32_000_000,stopAtErrors:true,useSystemFonts:true,cMapUrl:base+'pdf-cmaps/',cMapPacked:true,standardFontDataUrl:base+'pdf-fonts/',wasmUrl:base+'pdf-wasm/'});
   const cancel=()=>{void loading.destroy();};signal?.addEventListener('abort',cancel,{once:true});
   let canvas;
   try {
